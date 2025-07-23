@@ -1,237 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Syafrial Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sayfraial Stresser</title>
   <style>
-    * { box-sizing: border-box; }
     body {
+      background: #0f0f0f;
+      color: #f0f0f0;
+      font-family: Arial, sans-serif;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: white;
+      padding: 0;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
+    header, main {
       padding: 20px;
     }
-    .card {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px #00ffc377;
-      margin-top: 20px;
-    }
-    input, select {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      background: #2b2b2b;
-      color: white;
-      border: 1px solid #444;
-      border-radius: 5px;
-    }
-    button {
-      background: #00ffc3;
-      color: black;
-      padding: 12px;
+    .container { max-width: 800px; margin: auto; }
+    .hidden { display: none; }
+    input, button, select {
+      margin: 5px 0;
+      padding: 8px;
       width: 100%;
       border: none;
-      font-weight: bold;
-      border-radius: 5px;
-      cursor: pointer;
+      border-radius: 4px;
     }
-    button:hover {
-      background: #00ddb0;
-    }
-    .error { color: #ff6666; text-align: center; }
-    .hidden { display: none; }
-    .title { text-align: center; color: #00ffc3; }
-    .logout {
-      background: transparent;
-      border: 1px solid #00ffc3;
-      color: #00ffc3;
-      margin-top: 10px;
-    }
+    button { background: #444; color: #fff; cursor: pointer; }
+    button:hover { background: #666; }
+    .admin-panel, .attack-panel, .dashboard, .login-panel { margin-top: 20px; }
+    h2 { border-bottom: 1px solid #444; padding-bottom: 5px; }
+    .flex { display: flex; gap: 20px; }
+    .half { flex: 1; }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- LOGIN PAGE -->
-    <div id="loginPage" class="card">
-      <h2 class="title">Login Panel</h2>
-      <input type="text" id="username" placeholder="Username">
-      <input type="password" id="password" placeholder="Password">
-      <button onclick="login()">Login</button>
-      <div id="loginError" class="error"></div>
-    </div>
+    <header>
+      <h1>Sayfraial Stresser</h1>
+      <p>Owner: Syafrial</p>
+    </header>
 
-    <!-- DASHBOARD -->
-    <div id="dashboardPage" class="card hidden">
-      <h2 class="title">Dashboard</h2>
-      <p><strong>Username:</strong> <span id="dashUser"></span></p>
-      <p><strong>Role:</strong> <span id="dashRole"></span></p>
-      <p><strong>Time Limit:</strong> <span id="dashTime"></span> sec</p>
-      <p><strong>CONC:</strong> <span id="dashConc"></span></p>
-      <p><strong>Expiry:</strong> <span id="dashExpiry"></span></p>
-      <button onclick="showAttackPanel()">Go to Attack Panel</button>
-      <button onclick="logout()" class="logout">Logout</button>
-    </div>
+    <main>
+      <!-- LOGIN -->
+      <section class="login-panel">
+        <h2>Login</h2>
+        <input id="username" placeholder="Username" />
+        <input id="password" type="password" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <p id="login-status"></p>
+      </section>
 
-    <!-- ATTACK PANEL -->
-    <div id="attackPage" class="card hidden">
-      <h2 class="title">Attack Panel</h2>
-      <input type="text" id="target" placeholder="Target URL/IP">
-      <input type="number" id="time" placeholder="Time (sec)">
-      <input type="number" id="concurrent" placeholder="Concurrent Threads">
-      <button onclick="launchAttack()">Start Attack</button>
-      <div id="attackResult" class="error"></div>
-      <button onclick="backToDashboard()" class="logout">Back</button>
-    </div>
+      <!-- DASHBOARD -->
+      <section class="dashboard hidden">
+        <h2>Dashboard</h2>
+        <p id="welcome-msg"></p>
+        <p><b>Attack Today:</b> 0 | <b>Month:</b> 0</p>
+        <p><b>Expires:</b> <span id="expiry"></span></p>
+      </section>
 
-    <!-- ADMIN: ADD USER -->
-    <div id="adminPage" class="card hidden">
-      <h2 class="title">Admin: Add User</h2>
-      <input type="text" id="newUsername" placeholder="New Username">
-      <input type="password" id="newPassword" placeholder="New Password">
-      <input type="number" id="newTime" placeholder="Time Limit (sec)">
-      <input type="number" id="newConc" placeholder="Concurrent Limit">
-      <input type="number" id="newDays" placeholder="Valid Days">
-      <button onclick="addUser()">Create User</button>
-      <div id="addUserResult" class="error"></div>
-      <button onclick="backToDashboard()" class="logout">Back</button>
-    </div>
+      <!-- ATTACK -->
+      <section class="attack-panel hidden">
+        <h2>Attack Panel</h2>
+        <input placeholder="Target URL/IP" />
+        <input placeholder="Time (seconds)" />
+        <input placeholder="Concurrent (CONC)" />
+        <select>
+          <option>L7</option>
+          <option>L4</option>
+        </select>
+        <button>Launch Attack</button>
+      </section>
+
+      <!-- ADMIN -->
+      <section class="admin-panel hidden">
+        <h2>Admin: Manage Users</h2>
+        <div class="flex">
+          <div class="half">
+            <h3>Add User</h3>
+            <input id="new-username" placeholder="Username" />
+            <input id="new-password" placeholder="Password" />
+            <input id="new-conc" placeholder="CONC" />
+            <input id="new-tl" placeholder="Time Limit" />
+            <input id="new-expiry" type="date" />
+            <button onclick="addUser()">Add</button>
+          </div>
+          <div class="half">
+            <h3>Delete User</h3>
+            <input id="del-username" placeholder="Username" />
+            <button onclick="deleteUser()">Delete</button>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script>
-    const API_URL = 'https://hospitable-bravery-production.up.railway.app/';
+    const API = "http://178.128.110.4:8080"; // ganti jika deploy lain
 
-    function show(id) {
-      document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
+    function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
 
-    function logout() {
-      localStorage.clear();
-      show('loginPage');
-    }
+      fetch(`${API}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Login gagal");
+          return res.json();
+        })
+        .then((data) => {
+          document.querySelector(".login-panel").classList.add("hidden");
+          document.querySelector(".dashboard").classList.remove("hidden");
+          document.querySelector(".attack-panel").classList.remove("hidden");
+          document.getElementById("welcome-msg").textContent = `Welcome, ${data.username}`;
+          document.getElementById("expiry").textContent = data.expiry;
 
-    function backToDashboard() {
-      show('dashboardPage');
-    }
-
-    async function login() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const errBox = document.getElementById('loginError');
-      errBox.textContent = "";
-
-      if (!username || !password) {
-        errBox.textContent = "Username dan password wajib diisi.";
-        return;
-      }
-
-      try {
-        const res = await fetch(`${API_URL}/api/login`, {
-          method: 'POST',
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password })
+          if (data.isAdmin) {
+            document.querySelector(".admin-panel").classList.remove("hidden");
+          }
+        })
+        .catch((err) => {
+          document.getElementById("login-status").textContent = "Login gagal";
         });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          localStorage.setItem("userData", JSON.stringify(data));
-          loadDashboard(data);
-        } else {
-          errBox.textContent = data.message || "Login gagal.";
-        }
-      } catch (err) {
-        errBox.textContent = "Server tidak tersedia.";
-      }
     }
 
-    function loadDashboard(data) {
-      document.getElementById('dashUser').textContent = data.username;
-      document.getElementById('dashRole').textContent = data.isAdmin ? 'Admin' : 'User';
-      document.getElementById('dashTime').textContent = data.timeLimit;
-      document.getElementById('dashConc').textContent = data.conc;
-      document.getElementById('dashExpiry').textContent = data.expiry;
-
-      show('dashboardPage');
-
-      if (data.isAdmin) {
-        const adminBtn = document.createElement("button");
-        adminBtn.textContent = "Admin Panel: Add User";
-        adminBtn.onclick = () => show('adminPage');
-        document.getElementById('dashboardPage').appendChild(adminBtn);
-      }
+    function addUser() {
+      const body = {
+        username: document.getElementById("new-username").value,
+        password: document.getElementById("new-password").value,
+        conc: Number(document.getElementById("new-conc").value),
+        timeLimit: Number(document.getElementById("new-tl").value),
+        expiry: new Date(document.getElementById("new-expiry").value).toISOString(),
+        isAdmin: false
+      };
+      fetch(`${API}/api/add-user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).then(() => alert("User added!"));
     }
 
-    async function launchAttack() {
-      const target = document.getElementById('target').value;
-      const time = document.getElementById('time').value;
-      const conc = document.getElementById('concurrent').value;
-      const resultBox = document.getElementById('attackResult');
-      const user = JSON.parse(localStorage.getItem('userData') || "{}");
-
-      resultBox.textContent = "";
-
-      if (!target || !time || !conc) {
-        resultBox.textContent = "Isi semua field.";
-        return;
-      }
-
-      try {
-        const res = await fetch(`${API_URL}/api/attack`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: user.username, target, time, conc })
-        });
-
-        const result = await res.json();
-        resultBox.textContent = result.message || "Attack sent.";
-      } catch (err) {
-        resultBox.textContent = "Gagal kirim attack.";
-      }
+    function deleteUser() {
+      const username = document.getElementById("del-username").value;
+      fetch(`${API}/api/delete-user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username })
+      }).then(() => alert("User deleted!"));
     }
-
-    async function addUser() {
-      const username = document.getElementById('newUsername').value.trim();
-      const password = document.getElementById('newPassword').value.trim();
-      const timeLimit = +document.getElementById('newTime').value;
-      const conc = +document.getElementById('newConc').value;
-      const days = +document.getElementById('newDays').value;
-      const result = document.getElementById('addUserResult');
-
-      result.textContent = "";
-
-      if (!username || !password || !timeLimit || !conc || !days) {
-        result.textContent = "Isi semua data user baru.";
-        return;
-      }
-
-      try {
-        const res = await fetch(`${API_URL}/api/adduser`, {
-          method: 'POST',
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password, timeLimit, conc, days })
-        });
-
-        const data = await res.json();
-        result.textContent = data.message || "User berhasil dibuat.";
-      } catch (err) {
-        result.textContent = "Gagal menambahkan user.";
-      }
-    }
-
-    // Auto-load dashboard if session exists
-    window.onload = () => {
-      const user = JSON.parse(localStorage.getItem("userData") || "null");
-      if (user) loadDashboard(user);
-    };
   </script>
 </body>
 </html>
