@@ -1,154 +1,331 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sayfraial Stresser</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syafrial's Stresser Panel</title>
   <style>
-    body {
-      background: #0f0f0f;
-      color: #f0f0f0;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #e0e0e0;
+      --primary: #6200ee;
+      --danger: #d32f2f;
     }
-    header, main {
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
       padding: 20px;
     }
-    .container { max-width: 800px; margin: auto; }
-    .hidden { display: none; }
-    input, button, select {
-      margin: 5px 0;
-      padding: 8px;
-      width: 100%;
-      border: none;
-      border-radius: 4px;
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
     }
-    button { background: #444; color: #fff; cursor: pointer; }
-    button:hover { background: #666; }
-    .admin-panel, .attack-panel, .dashboard, .login-panel { margin-top: 20px; }
-    h2 { border-bottom: 1px solid #444; padding-bottom: 5px; }
-    .flex { display: flex; gap: 20px; }
-    .half { flex: 1; }
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    input, select, button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border: none;
+      background: #333;
+      color: white;
+    }
+    button {
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-primary {
+      background: var(--primary);
+    }
+    .btn-danger {
+      background: var(--danger);
+    }
+    .hidden {
+      display: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #333;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Sayfraial Stresser</h1>
-      <p>Owner: Syafrial</p>
-    </header>
+    <!-- Login Section -->
+    <div id="login-section" class="card">
+      <h1>Stresser Panel</h1>
+      <input type="text" id="login-username" placeholder="Username">
+      <input type="password" id="login-password" placeholder="Password">
+      <button id="login-btn" class="btn-primary">Login</button>
+      <p>own syafrial</p>
+    </div>
 
-    <main>
-      <!-- LOGIN -->
-      <section class="login-panel">
-        <h2>Login</h2>
-        <input id="username" placeholder="Username" />
-        <input id="password" type="password" placeholder="Password" />
-        <button onclick="login()">Login</button>
-        <p id="login-status"></p>
-      </section>
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden">
+      <div class="card">
+        <h2>Welcome, <span id="display-username"></span></h2>
+        <button id="logout-btn" class="btn-danger">Logout</button>
+      </div>
 
-      <!-- DASHBOARD -->
-      <section class="dashboard hidden">
-        <h2>Dashboard</h2>
-        <p id="welcome-msg"></p>
-        <p><b>Attack Today:</b> 0 | <b>Month:</b> 0</p>
-        <p><b>Expires:</b> <span id="expiry"></span></p>
-      </section>
+      <!-- Admin Panel -->
+      <div id="admin-panel" class="card hidden">
+        <h3>Admin Panel</h3>
+        <input type="text" id="new-username" placeholder="New username">
+        <input type="password" id="new-password" placeholder="New password">
+        <input type="number" id="new-conc" placeholder="Concurrent limit">
+        <input type="number" id="new-time" placeholder="Time limit (seconds)">
+        <input type="number" id="new-days" placeholder="Days active">
+        <button id="add-user-btn" class="btn-primary">Add User</button>
+        
+        <h4>User List</h4>
+        <div id="user-list"></div>
+      </div>
 
-      <!-- ATTACK -->
-      <section class="attack-panel hidden">
-        <h2>Attack Panel</h2>
-        <input placeholder="Target URL/IP" />
-        <input placeholder="Time (seconds)" />
-        <input placeholder="Concurrent (CONC)" />
-        <select>
-          <option>L7</option>
-          <option>L4</option>
+      <!-- Attack Panel -->
+      <div class="card">
+        <h3>Attack Panel</h3>
+        <select id="attack-method">
+          <option value="L4">Layer 4 (UDP/TCP)</option>
+          <option value="L7">Layer 7 (HTTP)</option>
         </select>
-        <button>Launch Attack</button>
-      </section>
+        <input type="text" id="attack-target" placeholder="Target IP/URL">
+        <input type="number" id="attack-duration" placeholder="Duration (seconds)">
+        <button id="attack-btn" class="btn-primary">Launch Attack</button>
+      </div>
 
-      <!-- ADMIN -->
-      <section class="admin-panel hidden">
-        <h2>Admin: Manage Users</h2>
-        <div class="flex">
-          <div class="half">
-            <h3>Add User</h3>
-            <input id="new-username" placeholder="Username" />
-            <input id="new-password" placeholder="Password" />
-            <input id="new-conc" placeholder="CONC" />
-            <input id="new-tl" placeholder="Time Limit" />
-            <input id="new-expiry" type="date" />
-            <button onclick="addUser()">Add</button>
-          </div>
-          <div class="half">
-            <h3>Delete User</h3>
-            <input id="del-username" placeholder="Username" />
-            <button onclick="deleteUser()">Delete</button>
-          </div>
-        </div>
-      </section>
-    </main>
+      <!-- History -->
+      <div class="card">
+        <h3>Attack History</h3>
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Target</th>
+              <th>Method</th>
+              <th>Duration</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
-    const API = "https://hospitable-bravery-production.up.railway.app/"; // ganti jika deploy lain
+    // DOM Elements
+    const loginSection = document.getElementById('login-section');
+    const dashboard = document.getElementById('dashboard');
+    const adminPanel = document.getElementById('admin-panel');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const attackBtn = document.getElementById('attack-btn');
+    const addUserBtn = document.getElementById('add-user-btn');
 
-    function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+    // State
+    let currentUser = null;
+    const API_URL = 'https://hospitable-bravery-production.up.railway.app/'; // Ganti dengan URL Railway/Vercel setelah deploy
 
-      fetch(`${API}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Login gagal");
-          return res.json();
-        })
-        .then((data) => {
-          document.querySelector(".login-panel").classList.add("hidden");
-          document.querySelector(".dashboard").classList.remove("hidden");
-          document.querySelector(".attack-panel").classList.remove("hidden");
-          document.getElementById("welcome-msg").textContent = `Welcome, ${data.username}`;
-          document.getElementById("expiry").textContent = data.expiry;
+    // Event Listeners
+    loginBtn.addEventListener('click', handleLogin);
+    logoutBtn.addEventListener('click', handleLogout);
+    attackBtn.addEventListener('click', handleAttack);
+    addUserBtn.addEventListener('click', handleAddUser);
 
-          if (data.isAdmin) {
-            document.querySelector(".admin-panel").classList.remove("hidden");
-          }
-        })
-        .catch((err) => {
-          document.getElementById("login-status").textContent = "Login gagal";
+    // Functions
+    async function handleLogin() {
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+
+      try {
+        const response = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
         });
+        const data = await response.json();
+
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        currentUser = data;
+        document.getElementById('display-username').textContent = data.username;
+        loginSection.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+
+        if (data.isAdmin) {
+          adminPanel.classList.remove('hidden');
+          loadUsers();
+        }
+        loadHistory();
+      } catch (error) {
+        alert('Connection error');
+      }
     }
 
-    function addUser() {
-      const body = {
-        username: document.getElementById("new-username").value,
-        password: document.getElementById("new-password").value,
-        conc: Number(document.getElementById("new-conc").value),
-        timeLimit: Number(document.getElementById("new-tl").value),
-        expiry: new Date(document.getElementById("new-expiry").value).toISOString(),
-        isAdmin: false
-      };
-      fetch(`${API}/api/add-user`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      }).then(() => alert("User added!"));
+    function handleLogout() {
+      currentUser = null;
+      dashboard.classList.add('hidden');
+      loginSection.classList.remove('hidden');
     }
 
-    function deleteUser() {
-      const username = document.getElementById("del-username").value;
-      fetch(`${API}/api/delete-user`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username })
-      }).then(() => alert("User deleted!"));
+    async function handleAttack() {
+      const target = document.getElementById('attack-target').value;
+      const method = document.getElementById('attack-method').value;
+      const duration = parseInt(document.getElementById('attack-duration').value);
+
+      if (!target || !duration) {
+        alert('Please fill all fields');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/attack`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: currentUser.username,
+            target,
+            method,
+            duration
+          })
+        });
+        const data = await response.json();
+
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        alert('Attack launched successfully!');
+        loadHistory();
+      } catch (error) {
+        alert('Failed to launch attack');
+      }
     }
+
+    async function handleAddUser() {
+      const username = document.getElementById('new-username').value;
+      const password = document.getElementById('new-password').value;
+      const conc = parseInt(document.getElementById('new-conc').value);
+      const timeLimit = parseInt(document.getElementById('new-time').value);
+      const daysActive = parseInt(document.getElementById('new-days').value);
+
+      if (!username || !password) {
+        alert('Username and password required');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/add-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminUsername: currentUser.username,
+            username,
+            password,
+            conc,
+            timeLimit,
+            daysActive
+          })
+        });
+        const data = await response.json();
+
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        alert('User added successfully!');
+        loadUsers();
+      } catch (error) {
+        alert('Failed to add user');
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const response = await fetch(`${API_URL}/users?username=${currentUser.username}`);
+        const users = await response.json();
+
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = users.map(user => `
+          <div style="margin: 10px 0; padding: 10px; background: #333; border-radius: 4px;">
+            <p>Username: ${user.username}</p>
+            <p>Concurrent: ${user.conc}</p>
+            <p>Time Limit: ${user.timeLimit}s</p>
+            <p>Expiry: ${new Date(user.expiry).toLocaleDateString()}</p>
+            ${user.username !== 'admin' ? `<button onclick="deleteUser('${user.username}')" class="btn-danger">Delete</button>` : ''}
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load users');
+      }
+    }
+
+    async function deleteUser(username) {
+      if (!confirm(`Delete user ${username}?`)) return;
+
+      try {
+        const response = await fetch(`${API_URL}/delete-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminUsername: currentUser.username,
+            targetUsername: username
+          })
+        });
+        const data = await response.json();
+
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        alert('User deleted');
+        loadUsers();
+      } catch (error) {
+        alert('Failed to delete user');
+      }
+    }
+
+    async function loadHistory() {
+      try {
+        const response = await fetch(`${API_URL}/users?username=${currentUser.username}`);
+        const users = await response.json();
+        const user = users.find(u => u.username === currentUser.username);
+
+        const historyTable = document.querySelector('#history-table tbody');
+        historyTable.innerHTML = user.history.map(attack => `
+          <tr>
+            <td>${attack.target}</td>
+            <td>${attack.method}</td>
+            <td>${attack.duration}s</td>
+            <td>${new Date(attack.timestamp).toLocaleString()}</td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load history');
+      }
+    }
+
+    // Expose to global scope
+    window.deleteUser = deleteUser;
   </script>
 </body>
 </html>
