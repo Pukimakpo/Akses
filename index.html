@@ -1,205 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Syafrial Stresser Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sayfraial Stresser</title>
   <style>
     body {
-      background-color: #0a0a0a;
-      font-family: 'Segoe UI', sans-serif;
-      color: #f0f0f0;
+      background-color: #111;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      text-align: center;
       margin: 0;
       padding: 0;
     }
     .container {
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-    }
-    h1, h2, h3 {
-      color: #00ff99;
+      margin: 50px auto;
+      max-width: 400px;
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 8px;
     }
     input, button {
       width: 100%;
       padding: 10px;
-      margin: 5px 0;
-      font-size: 16px;
+      margin: 8px 0;
+      background: #333;
+      color: #fff;
       border: none;
       border-radius: 4px;
     }
-    input {
-      background: #1f1f1f;
-      color: white;
+    button:hover {
+      background: #444;
     }
-    button {
-      background-color: #00cc88;
-      color: white;
-      cursor: pointer;
-    }
-    .hidden { display: none; }
-    .section {
-      background: #151515;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    .admin-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .admin-actions button {
-      flex: 1;
-    }
-    footer {
-      text-align: center;
-      color: #888;
+    .admin-panel {
+      display: none;
       margin-top: 20px;
+    }
+    .section {
+      margin: 20px auto;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Syafrial Stresser Panel</h1>
+    <h2>Login Sayfraial</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
 
-    <!-- Login -->
-    <div class="section" id="loginSection">
-      <h2>Login</h2>
-      <input type="text" id="username" placeholder="Username" />
-      <input type="password" id="password" placeholder="Password" />
-      <button onclick="login()">Login</button>
-    </div>
-
-    <!-- Main Panel -->
-    <div class="section hidden" id="mainPanel">
-      <h2>Welcome, <span id="userDisplay"></span></h2>
-
-      <!-- Attack Panel -->
-      <div id="attackPanel">
-        <h3>Attack Panel</h3>
-        <input type="text" id="target" placeholder="Target IP / Domain">
-        <input type="number" id="duration" placeholder="Duration (seconds)">
-        <button onclick="sendAttack()">Start Attack</button>
-      </div>
-
-      <!-- Admin Panel -->
-      <div id="adminPanel" class="hidden">
-        <h3>Admin Panel</h3>
-        <input id="addUsername" placeholder="New Username">
-        <input id="addPassword" placeholder="New Password">
-        <input id="addConc" type="number" placeholder="Concurrency Limit">
-        <input id="addTime" type="number" placeholder="Time Limit (sec)">
-        <input id="addDays" type="number" placeholder="Active Days">
+    <div id="adminPanel" class="admin-panel">
+      <h3>Admin Panel</h3>
+      <div class="section">
+        <h4>Add User</h4>
+        <input type="text" id="newUsername" placeholder="Username">
+        <input type="text" id="newPassword" placeholder="Password">
+        <input type="number" id="newConc" placeholder="Concurrency">
+        <input type="number" id="newTime" placeholder="Time Limit">
+        <input type="date" id="newExpiry">
         <button onclick="addUser()">Add User</button>
-
+      </div>
+      <div class="section">
         <h4>User List</h4>
-        <div id="userList"></div>
+        <ul id="userList"></ul>
       </div>
-
-      <!-- Stats -->
-      <div id="stats">
-        <h3>Attack Stats</h3>
-        <div id="attackStats"></div>
-      </div>
-
-      <!-- Logout -->
-      <button onclick="logout()">Logout</button>
     </div>
-
-    <!-- Contact -->
-    <div class="section" id="contact">
-      <h3>Kontak Owner</h3>
-      <p>Instagram: <a href="https://instagram.com/syafrial.id" style="color:#00cc88;">@syafrial.id</a></p>
-    </div>
-
-    <footer>&copy; 2025 Syafrial Stresser. All rights reserved.</footer>
   </div>
 
   <script>
-    const API = "http://178.128.110.4:8080";
-    let currentUser = null;
+    let currentUser;
 
-    async function login() {
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
 
-      const res = await fetch(`${API}/api/login`, {
+      const res = await fetch("http://178.128.110.4:8080/api/login", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ username, password })
       });
 
       const data = await res.json();
-      if (!res.ok) return alert(data.message);
-
-      currentUser = data.user;
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("mainPanel").classList.remove("hidden");
-      document.getElementById("userDisplay").innerText = currentUser.username;
-
-      if (currentUser.username === "1") {
-        document.getElementById("adminPanel").classList.remove("hidden");
-        loadUsers();
+      if (data.success) {
+        currentUser = data.user;
+        if (currentUser.role === "admin") {
+          document.getElementById("adminPanel").style.display = "block";
+          loadUsers();
+        } else {
+          alert("Login berhasil sebagai user.");
+        }
+      } else {
+        alert("Login gagal: " + data.message);
       }
+    });
 
-      loadStats();
-    }
-
-    async function sendAttack() {
-      const target = document.getElementById("target").value;
-      const duration = document.getElementById("duration").value;
-      if (!target || !duration) return alert("Isi semua field.");
-
-      const res = await fetch(`${API}/api/attack`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ target, duration, user: currentUser.username })
+    async function loadUsers() {
+      const res = await fetch("http://178.128.110.4:8080/api/users");
+      const users = await res.json();
+      const list = document.getElementById("userList");
+      list.innerHTML = "";
+      users.forEach(user => {
+        const li = document.createElement("li");
+        li.textContent = `${user.username} | conc: ${user.conc} | expiry: ${user.expiry}`;
+        const btn = document.createElement("button");
+        btn.textContent = "Delete";
+        btn.onclick = async () => {
+          await fetch(`http://178.128.110.4:8080/api/users/${user.username}`, { method: "DELETE" });
+          loadUsers();
+        };
+        li.appendChild(btn);
+        list.appendChild(li);
       });
-
-      const data = await res.json();
-      alert(data.message);
-      loadStats();
     }
 
     async function addUser() {
-      const username = document.getElementById("addUsername").value;
-      const password = document.getElementById("addPassword").value;
-      const conc = +document.getElementById("addConc").value;
-      const timeLimit = +document.getElementById("addTime").value;
-      const days = +document.getElementById("addDays").value;
+      const username = document.getElementById("newUsername").value;
+      const password = document.getElementById("newPassword").value;
+      const conc = parseInt(document.getElementById("newConc").value);
+      const time_limit = parseInt(document.getElementById("newTime").value);
+      const expiry = document.getElementById("newExpiry").value;
 
-      const res = await fetch(`${API}/api/users`, {
+      const res = await fetch("http://178.128.110.4:8080/api/users", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ username, password, conc, timeLimit, days })
+        body: JSON.stringify({ username, password, conc, time_limit, expiry })
       });
-
       const data = await res.json();
-      alert(data.message);
-      loadUsers();
-    }
-
-    async function loadUsers() {
-      const res = await fetch(`${API}/api/users`);
-      const users = await res.json();
-      document.getElementById("userList").innerHTML = users.map(u =>
-        `<div>${u.username} - Exp: ${new Date(u.expiry).toLocaleDateString()}</div>`
-      ).join("");
-    }
-
-    async function loadStats() {
-      const res = await fetch(`${API}/api/stats?user=${currentUser.username}`);
-      const stats = await res.json();
-      document.getElementById("attackStats").innerHTML = `
-        Total: ${stats.total} <br>
-        Hari Ini: ${stats.today} <br>
-        Bulan Ini: ${stats.month}
-      `;
-    }
-
-    function logout() {
-      location.reload();
+      if (data.success) {
+        alert("User added.");
+        loadUsers();
+      } else {
+        alert("Failed: " + data.message);
+      }
     }
   </script>
 </body>
